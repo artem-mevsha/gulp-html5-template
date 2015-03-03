@@ -10,6 +10,7 @@ var rename = require("gulp-rename");
 var livereload = require('gulp-livereload');
 var connect = require('connect');
 var serveStatic = require('serve-static');
+var spritesmith = require('gulp.spritesmith');
 
 gulp.task('stylus', function() {
   gulp.src('./src/css/**/*.styl')
@@ -41,6 +42,24 @@ gulp.task('imagemin',function(){
    return gulp.src('./src/img/**/*')
       .pipe(imagemin())
       .pipe(gulp.dest('./dest/img/'));
+});
+
+gulp.task('sprite', function() {
+    var spriteData =
+        gulp.src('./src/for_sprite/*.*') // путь, откуда берем картинки для спрайта
+            .pipe(spritesmith({
+                imgName: 'sprite.png',
+                cssName: 'sprite.styl',
+                cssFormat: 'stylus',
+                algorithm: 'binary-tree',
+                cssTemplate: 'stylus.template.mustache',
+                cssVarMap: function(sprite) {
+                    sprite.name = 's-' + sprite.name;
+                }
+            }));
+
+    spriteData.img.pipe(gulp.dest('./src/img/')); // путь, куда сохраняем картинку
+    spriteData.css.pipe(gulp.dest('./src/css/')); // путь, куда сохраняем стили
 });
 
 gulp.task('server', function() {
@@ -78,4 +97,5 @@ gulp.task('product', ['stylus','templates','imagemin','js'], function() {
     .pipe(gulp.dest('./dest/js'));
 });
 
-gulp.task('default',['watch','stylus','templates','imagemin','js']);
+
+gulp.task('default',['watch','stylus','templates','imagemin','js', 'sprite']);
