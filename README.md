@@ -21,19 +21,21 @@ To concat and minify scripts and styles you need type their names in gulpfile.js
 gulp product
 ```
 
-For generating css sprites
+###For generating css sprites
 
 1. Add icon to src/img/for_sprite directory
 
 2. Check src/css/sprite.styl file for new variable (example $s-new-icon)
 
 3. Add style to style.styl
-```
-.m-new-icon
-    sprite($s-new-icon)
-```
 
 4. Use sprite icon in .jade file like:
 ```
+// style.styl:
+.m-new-icon
+    sprite($s-new-icon)
+```
+```
+// .jade
 i.sprite.m-arenda
 ```
