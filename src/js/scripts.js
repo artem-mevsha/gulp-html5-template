@@ -1,4 +1,3 @@
 $(function() {
-	console.log('123');
-	console.log(312);
+	console.log('Gulp html 5 template');
 });

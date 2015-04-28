@@ -1,16 +1,16 @@
 spriteWidth($sprite)
-    width $sprite[4]
+  width $sprite[4]
 
 spriteHeight($sprite)
-    height $sprite[5]
+  height $sprite[5]
 
 spritePosition($sprite)
-    background-position $sprite[2] $sprite[3]
+  background-position $sprite[2] $sprite[3]
 
 
 sprite($sprite)
-    if !match('hover', selector()) && !match('active', selector())
-        spriteImage($sprite)
-    spritePosition($sprite)
-    spriteWidth($sprite)
-    spriteHeight($sprite)
+  if !match('hover', selector()) && !match('active', selector())
+    spriteImage($sprite)
+  spritePosition($sprite)
+  spriteWidth($sprite)
+  spriteHeight($sprite)

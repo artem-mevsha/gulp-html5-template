@@ -2,9 +2,9 @@ gulp-html5-template
 ===================
 
 HTML5 template using jade, stylus, localhost, concatenation and mifification.
-To see page changes after each fix, you need to install livereload https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei
+To see page changes after each fix, you need to install [*livereload*](https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei)
 
-To run this application nodejs must be installed http://nodejs.org/
+To run this application [*nodejs*](http://nodejs.org/) must be installed.
 Go to this directory and type
 ```
 npm install
@@ -37,5 +37,5 @@ gulp product
 ```
 ```
 // .jade
-i.sprite.m-arenda
+i.sprite.m-new-icon
 ```
