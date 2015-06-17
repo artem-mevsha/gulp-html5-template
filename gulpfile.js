@@ -63,12 +63,12 @@ gulp.task('sprite', function() {
 });
 
 gulp.task('server', function() {
-	connect()
-	  .use(require('connect-livereload')())
-	  .use(serveStatic(__dirname + '/dest'))
-	  .listen('3000');
+  connect()
+    .use(require('connect-livereload')())
+    .use(serveStatic(__dirname + '/dest'))
+    .listen('3000');
 
-	console.log('Server is running on http://localhost:3000');
+  console.log('Server is running on http://localhost:3000');
 });
 
 
@@ -85,7 +85,7 @@ gulp.task('product', ['stylus','templates','imagemin','js'], function() {
   gulp.src(['dest/css/style.css',
             'dest/css/media.css',
     ])
-		.pipe(concat('_main.min.css'))
+    .pipe(concat('_main.min.css'))
     .pipe(minifyCSS())
     .pipe(gulp.dest('dest/css'));
 
