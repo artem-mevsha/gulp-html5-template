@@ -38,15 +38,23 @@ gulp.task('js', function() {
     .pipe(livereload());
 });
 
+gulp.task('fonts', function() {
+  return gulp.src(['src/fonts/**/*.*'])
+    .pipe(gulp.dest('dest/fonts/'))
+    .pipe(livereload());
+});
+
 gulp.task('imagemin',function(){
    return gulp.src('src/img/**/*')
-      .pipe(imagemin())
+      .pipe(imagemin({
+        progressive: true
+      }))
       .pipe(gulp.dest('dest/img/'));
 });
 
 gulp.task('sprite', function() {
   var spriteData =
-    gulp.src('src/img/for_sprite/*.*') // путь, откуда берем картинки для спрайта
+    gulp.src('src/img/for_sprite/*.*')
       .pipe(spritesmith({
         imgName: 'sprite.png',
         cssName: 'sprite.styl',
@@ -58,8 +66,8 @@ gulp.task('sprite', function() {
         }
       }));
 
-  spriteData.img.pipe(gulp.dest('src/img/')); // путь, куда сохраняем картинку
-  spriteData.css.pipe(gulp.dest('src/css/')); // путь, куда сохраняем стили
+  spriteData.img.pipe(gulp.dest('src/img/'));
+  spriteData.css.pipe(gulp.dest('src/css/'));
 });
 
 gulp.task('server', function() {
@@ -78,10 +86,11 @@ gulp.task('watch', function(){
   gulp.watch('src/**/*.jade',['templates']);
   gulp.watch('src/img/**/*',['imagemin']);
   gulp.watch('src/js/**/*',['js']);
+  gulp.watch('src/fonts/**/*',['fonts']);
   gulp.start('server');
 });
 
-gulp.task('product', ['stylus','templates','imagemin','js'], function() {
+gulp.task('product', ['stylus','templates','imagemin','js', 'sprite', 'fonts'], function() {
   gulp.src(['dest/css/style.css',
             'dest/css/media.css',
     ])
@@ -98,4 +107,4 @@ gulp.task('product', ['stylus','templates','imagemin','js'], function() {
 });
 
 
-gulp.task('default',['watch','stylus','templates','imagemin','js', 'sprite']);
+gulp.task('default',['watch','stylus','templates','imagemin','js', 'sprite', 'fonts']);
