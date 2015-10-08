@@ -7,95 +7,148 @@ var imagemin    = require('gulp-imagemin');
 var concat      = require('gulp-concat');
 var uglify      = require('gulp-uglify');
 var rename      = require("gulp-rename");
-var livereload  = require('gulp-livereload');
-var connect     = require('connect');
-var serveStatic = require('serve-static');
-var spritesmith = require('gulp.spritesmith');
+var webserver   = require('gulp-webserver');
+var useref      = require('gulp-useref');
+var gulpif      = require('gulp-if');
 
+var path = {
+  SRC: 'src/',
+  SRC_STYL: 'src/css/**/*.styl',
+  SRC_CSS: 'src/css/**/*.css',
+  SRC_JS: 'src/js/**/*.js',
+  SRC_BOWER: 'src/bower_components/**/*',
+  SRC_FONTS: 'src/fonts/**/*.*',
+  SRC_IMG: 'src/img/**/*',
+  JADE: 'src/**/*.jade',
+  DEST: 'dest/',
+  DEST_CSS: 'dest/css/',
+  DEST_JS: 'dest/js/',
+  DEST_BOWER: 'dest/bower_components/',
+  DEST_FONTS: 'dest/fonts/',
+  DEST_IMG: 'dest/img/',
+  DEST_HTML: 'dest/*.html',
+  BUILD: 'build/',
+  BUILD_IMG: 'build/img/',
+};
+
+/**
+ * Compile stylus to css and replace to dest folder
+ */
 gulp.task('stylus', function() {
-  gulp.src('src/css/**/*.styl')
-    .pipe(stylus({use: nib()}))
+  gulp.src([path.SRC_STYL])
+    .pipe(stylus({
+      use: [nib()],
+      url: {
+        name: 'inline-image',
+        limit: false
+      }
+    }))
     .on('error', console.log)
-    .pipe(gulp.dest('dest/css/'))
-    .pipe(minifyCSS({keepBreaks:true}))
-    .pipe(rename({suffix: ".min"}))
-    .pipe(gulp.dest('dest/css/'))
-    .pipe(livereload());
+    .pipe(gulp.dest(path.DEST_CSS));
+    // .pipe(minifyCSS({keepSpecialComments: 0}))
+    // .pipe(rename({suffix: ".min"}))
+    // .pipe(gulp.dest('dest/css/'));
 });
 
+/**
+ * Compile jade to html and replace to dest folder
+ */
 gulp.task('templates', function() {
-  return gulp.src('src/**/*.jade')
+  gulp.src(path.JADE)
     .pipe(jade({
       pretty: true
     }))
-    .pipe(gulp.dest('dest/'))
-    .pipe(livereload());
+    .pipe(gulp.dest(path.DEST));
 });
 
-gulp.task('js', function() {
-  return gulp.src(['src/js/**/*.js'])
-    .pipe(gulp.dest('dest/js/'))
-    .pipe(livereload());
+/**
+ * Copy all not compiled files to dest folder
+ */
+gulp.task('assets', function() {
+  gulp.src(path.SRC_JS)
+    .pipe(gulp.dest(path.DEST_JS));
+  gulp.src(path.SRC_BOWER)
+  .pipe(gulp.dest(path.DEST_BOWER));
+  gulp.src(path.SRC_FONTS)
+    .pipe(gulp.dest(path.DEST_FONTS));
+  gulp.src(path.SRC_CSS)
+    .pipe(gulp.dest(path.DEST_CSS));
 });
 
+/**
+ * Minify all images and replace to dest folder
+ */
 gulp.task('imagemin',function(){
-   return gulp.src('src/img/**/*')
-      .pipe(imagemin())
-      .pipe(gulp.dest('dest/img/'));
+   gulp.src(path.SRC_IMG)
+    .pipe(imagemin({
+      progressive: true,
+    }))
+    .pipe(gulp.dest(path.DEST_IMG));
 });
 
-gulp.task('sprite', function() {
-  var spriteData =
-    gulp.src('src/img/for_sprite/*.*') // путь, откуда берем картинки для спрайта
-      .pipe(spritesmith({
-        imgName: 'sprite.png',
-        cssName: 'sprite.styl',
-        cssFormat: 'stylus',
-        algorithm: 'binary-tree',
-        cssTemplate: 'stylus.template.mustache',
-        cssVarMap: function(sprite) {
-          sprite.name = 's-' + sprite.name;
-        }
-      }));
-
-  spriteData.img.pipe(gulp.dest('src/img/')); // путь, куда сохраняем картинку
-  spriteData.css.pipe(gulp.dest('src/css/')); // путь, куда сохраняем стили
+/**
+ * Webserver for dest version
+ */
+gulp.task('webserver', function() {
+  gulp.src(path.DEST)
+    .pipe(webserver({
+      livereload: true,
+      host: '0.0.0.0'
+    }));
+  console.log('Server is running on localhost:8000');
 });
 
-gulp.task('server', function() {
-  connect()
-    .use(require('connect-livereload')())
-    .use(serveStatic(__dirname + '/dest'))
-    .listen('3000');
-
-  console.log('Server is running on http://localhost:3000');
-});
-
-
+/**
+ * Wather for dynamic file changes
+ */
 gulp.task('watch', function(){
-  livereload.listen();
-  gulp.watch('src/css/*.styl',['stylus']);
-  gulp.watch('src/**/*.jade',['templates']);
-  gulp.watch('src/img/**/*',['imagemin']);
-  gulp.watch('src/js/**/*',['js']);
-  gulp.start('server');
+  gulp.watch(path.SRC_STYL,['stylus']);
+  gulp.watch(path.JADE,['templates']);
+  gulp.watch(path.SRC_IMG,['imagemin']);
+  gulp.watch([
+    path.SRC_CSS,
+    path.SRC_JS,
+    path.SRC_FONTS,
+    path.SRC_BOWER
+  ],['assets']);
 });
 
-gulp.task('product', ['stylus','templates','imagemin','js'], function() {
-  gulp.src(['dest/css/style.css',
-            'dest/css/media.css',
-    ])
-    .pipe(concat('_main.min.css'))
-    .pipe(minifyCSS())
-    .pipe(gulp.dest('dest/css'));
+/**
+ * Build assets. Copy only minified and concatinated files to build folder
+ * Replace assets filenames to minifed files
+ * Example:
+ * <!-- build:js js/bundle.min.js-->
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="js/script1.js"></script>
+    <script src="js/script2.js"></script>
+    <!-- endbuild-->
+ * Will be replaced by 'js/bundle.min.js'
+ */
+gulp.task('build', ['assets', 'stylus','templates','imagemin'], function() {
+  var assets = useref.assets();
+  gulp.src(path.DEST_HTML)
+    .pipe(assets)
+    .pipe(gulpif('*.js', uglify()))
+    .pipe(gulpif('*.css', minifyCSS({keepSpecialComments: 0})))
+    .pipe(assets.restore())
+    .pipe(useref())
+    .pipe(gulp.dest(path.BUILD));
 
-  gulp.src(['dest/js/vendor/jquery-1.11.0.min.js',
-            'dest/js/scripts.js',
-    ])
-    .pipe(uglify())
-    .pipe(concat('_main.min.js'))
-    .pipe(gulp.dest('dest/js'));
+  gulp.src(path.DEST_IMG)
+    .pipe(gulp.dest(path.BUILD_IMG));
+
 });
 
+/**
+ * Webserver for build version
+ */
+gulp.task('build:serve', ['watch', 'build'], function() {
+  gulp.src(path.BUILD)
+    .pipe(webserver({
+      livereload: true,
+      host: '0.0.0.0'
+    }));
+  console.log('Server is running on localhost:8000');
+});
 
-gulp.task('default',['watch','stylus','templates','imagemin','js', 'sprite']);
+gulp.task('default',['watch', 'webserver', 'assets', 'stylus', 'templates', 'imagemin']);

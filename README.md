@@ -1,41 +1,62 @@
 gulp-html5-template
 ===================
 
-HTML5 template using jade, stylus, localhost, concatenation and mifification.
-To see page changes after each fix, you need to install [*livereload*](https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei)
+##HTML5 template using jade, stylus, localhost, imagemin, concatenation and mifification.
 
 To run this application [*nodejs*](http://nodejs.org/) must be installed.
-Go to this directory and type
+Install gulp and bower globally:
+```
+npm install -g gulp bower
+```
+Go to this project directory and type:
 ```
 npm install
+bower install
 ```
 to install all node modules
 
-To run gulp task type
+###To run gulp task type
 ```
 gulp
 ```
+and then open [*localhost:8000*](http://localhost:8000). Folder with project is *dest* by default
 
-To concat and minify scripts and styles you need type their names in gulpfile.js in task 'product'. Then run
+#### To use base64 image encoding use *inline-image* stylus directive
+Example:
+```styl
+.stas-base64
+  width 67px
+  height 67px
+  background inline-image('../img/stas.jpg')
 ```
-gulp product
+will be trasformed to
+```css
+.stas-base64 {
+  width: 67px;
+  height: 67px;
+  background: url(data:image/png;base64,R0lGODlhEAAQAMQAAORHHOVSKud);
+}
 ```
 
-###For generating css sprites
-
-1. Add icon to src/img/for_sprite directory
-
-2. Check src/css/sprite.styl file for new variable (example $s-new-icon)
-
-3. Add style to style.styl
-
-4. Use sprite icon in .jade file like:
+###To concat and minify scripts and styles type:
 ```
-// style.styl:
-.m-new-icon
-    sprite($s-new-icon)
+gulp build
 ```
+
+This task will make minified & concatinated files and will create build version of project (folder *build* by default)
+Example:
+Files
+```html
+<!-- build:js js/bundle.min.js-->
+<script src="bower_components/jquery/dist/jquery.js"></script>
+<script src="js/script1.js"></script>
+<script src="js/script2.js"></script>
+<!-- endbuild-->
 ```
-// .jade
-i.sprite.m-new-icon
+Will be replaced by 'js/bundle.min.js' in build folder
+
+###To watch production build type
 ```
+gulp build:serve
+```
+and then open [*localhost:8000*](http://localhost:8000). Folder with project is *build* by default
