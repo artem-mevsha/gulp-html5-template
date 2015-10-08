@@ -1,7 +1,7 @@
 gulp-html5-template
 ===================
 
-##HTML5 template using jade, stylus, localhost, imagemin, concatenation and mifification.
+##HTML5 template using jade, stylus, localhost, imagemin, concatenation and minification.
 
 To run this application [*nodejs*](http://nodejs.org/) must be installed.
 Install gulp and bower globally:
