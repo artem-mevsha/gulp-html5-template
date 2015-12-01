@@ -29,7 +29,6 @@ var path = {
   DEST_HTML: 'dest/*.html',
   BUILD: 'build/',
   BUILD_IMG: 'build/img/',
-  BUILD_FONTS: 'build/fonts/',
 };
 
 /**
@@ -135,11 +134,8 @@ gulp.task('build', ['assets', 'stylus','templates','imagemin'], function() {
     .pipe(useref())
     .pipe(gulp.dest(path.BUILD));
 
-  gulp.src(path.DEST_IMG + '**/*.*')
+  gulp.src(path.DEST_IMG)
     .pipe(gulp.dest(path.BUILD_IMG));
-
-  gulp.src(path.DEST_FONTS + '**/*.*')
-    .pipe(gulp.dest(path.BUILD_FONTS));
 
 });
 
