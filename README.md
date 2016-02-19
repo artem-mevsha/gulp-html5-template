@@ -24,14 +24,14 @@ and then open [*localhost:8000*](http://localhost:8000). Folder with project is 
 #### To use base64 image encoding use *inline-image* stylus directive
 Example:
 ```styl
-.stas-base64
+.some-image
   width 67px
   height 67px
-  background inline-image('../img/stas.jpg')
+  background inline-image('../img/some-image.jpg')
 ```
 will be trasformed to
 ```css
-.stas-base64 {
+.some-image {
   width: 67px;
   height: 67px;
   background: url(data:image/png;base64,R0lGODlhEAAQAMQAAORHHOVSKud);
