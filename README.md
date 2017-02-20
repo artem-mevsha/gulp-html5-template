@@ -60,3 +60,4 @@ Will be replaced by 'js/bundle.min.js' in build folder
 gulp build:serve
 ```
 and then open [*localhost:8000*](http://localhost:8000). Folder with project is *build* by default
+
